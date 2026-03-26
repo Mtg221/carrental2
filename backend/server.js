@@ -1,8 +1,6 @@
 require('dotenv').config();
 const express   = require("express");
 const cors      = require("cors");
-const path      = require("path");
-const jwt       = require("jsonwebtoken");
 
 const connectDB = require("./connection/connection");
 
@@ -13,7 +11,7 @@ const bookingRoutes = require("./routes/booking");
 const app  = express();
 const PORT = process.env.PORT || 3001;
 
-// ✅ Check JWT_SECRET (important)
+// ✅ Check JWT_SECRET
 if (!process.env.JWT_SECRET) {
   throw new Error("❌ JWT_SECRET is missing in .env");
 }
@@ -24,16 +22,15 @@ connectDB();
 // ─── Middleware ───────────────────────────────────────
 app.use(cors({ origin: "*" }));
 app.use(express.json());
-app.use(express.static(path.join(__dirname, "../frontend/public")));
 
 // ─── Routes ───────────────────────────────────────────
 app.use("/api/auth",     authRoutes);
 app.use("/api/cars",     carRoutes);
 app.use("/api/bookings", bookingRoutes);
 
-// ─── Catch-all (SPA) ──────────────────────────────────
-app.get("/{*path}", (req, res) => {
-  res.sendFile(path.join(__dirname, "../frontend/public/index.html"));
+// ✅ Simple test route
+app.get("/", (req, res) => {
+  res.send("🚗 DriveElite API is running");
 });
 
 // ─── Start server ─────────────────────────────────────
