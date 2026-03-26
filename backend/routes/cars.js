@@ -1,25 +1,58 @@
-const mongoose = require("mongoose");
+const express = require("express");
+const router  = express.Router();
+const Car     = require("../models/cars");
 
-const carSchema = new mongoose.Schema(
-  {
-    make:         { type: String, required: true },
-    model:        { type: String, required: true },
-    year:         { type: Number, required: true },
-    category:     { type: String, required: true },
-    seats:        Number,
-    transmission: String,
-    fuel:         String,
-    pricePerDay:  { type: Number, required: true },
-    image:        String,
-    available:    { type: Boolean, default: true },
-    description:  String,
-    mileage:      String,
-    features:     [String],
-  },
-  {
-    timestamps: true,
-    toJSON: { virtuals: true, transform: (_, ret) => { delete ret.__v; return ret; } },
+// GET all available cars
+router.get("/", async (req, res) => {
+  try {
+    const cars = await Car.find();
+    res.json(cars);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
-);
+});
 
-module.exports = mongoose.model("Car", carSchema);
+// GET single car by ID
+router.get("/:id", async (req, res) => {
+  try {
+    const car = await Car.findById(req.params.id);
+    if (!car) return res.status(404).json({ error: "Car not found" });
+    res.json(car);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// POST create a new car (admin)
+router.post("/", async (req, res) => {
+  try {
+    const car = await Car.create(req.body);
+    res.status(201).json(car);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+// PUT update a car (admin)
+router.put("/:id", async (req, res) => {
+  try {
+    const car = await Car.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    if (!car) return res.status(404).json({ error: "Car not found" });
+    res.json(car);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+// DELETE a car (admin)
+router.delete("/:id", async (req, res) => {
+  try {
+    const car = await Car.findByIdAndDelete(req.params.id);
+    if (!car) return res.status(404).json({ error: "Car not found" });
+    res.json({ message: "Car deleted" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+module.exports = router;
