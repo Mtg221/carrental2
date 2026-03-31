@@ -19,7 +19,7 @@ const bookingSchema = new mongoose.Schema(
     totalPrice:  Number,
     status:      { type: String, default: "confirmed" },
   },
-  { timestamps: true }
+  { timestamps: true, toJSON: { virtuals: true, transform: (_, ret) => { ret.id = ret._id; delete ret.__v; return ret; } } }
 );
 
 module.exports = mongoose.model("Booking", bookingSchema);

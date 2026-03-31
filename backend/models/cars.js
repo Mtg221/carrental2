@@ -16,7 +16,7 @@ const carSchema = new mongoose.Schema(
     mileage:      String,
     features:     [String],
   },
-  { timestamps: true }
+  { timestamps: true, toJSON: { virtuals: true, transform: (_, ret) => { ret.id = ret._id; delete ret.__v; return ret; } } }
 );
 
 module.exports = mongoose.model("Car", carSchema);

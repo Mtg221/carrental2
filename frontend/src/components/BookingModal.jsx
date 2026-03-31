@@ -48,7 +48,22 @@ export default function BookingModal({ car, onClose, showToast }) {
     try {
       await apiFetch('/bookings', {
         method: 'POST',
-        body: JSON.stringify({ carId: car.id, startDate, endDate, extras: [...extras] }),
+        body: JSON.stringify({
+        carId: car.id,
+        car: {
+          make: car.make,
+          model: car.model,
+          image: car.image,
+          pricePerDay: car.pricePerDay,
+        },
+        startDate,
+        endDate,
+        days,
+        extras: [...extras],
+        extrasTotal,
+        carTotal,
+        totalPrice,
+      }),
       })
       onClose()
       showToast('Booking confirmed! 🎉', 'success')
